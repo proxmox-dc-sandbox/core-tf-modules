@@ -1,0 +1,23 @@
+#cloud-config
+users:
+  - name: oz_user
+    groups: sudo
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: true
+    ssh-authorized-keys:
+%{ for key in ssh_keys ~}
+      - ${key}
+%{ endfor ~}
+
+ssh_pwauth: false
+
+package_upgrade: true
+
+packages:
+  - wireguard-tools
+  - jq
+  - curl
+
+runcmd:
+  - echo "VM provisioned successfully"

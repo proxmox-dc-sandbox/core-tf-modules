@@ -1,0 +1,24 @@
+# CODEOWNERS
+#
+# Owners must be a GitHub user (@username) or a team (@org/team-name) with
+# write access to this repository. An entry that does not resolve is ignored
+# by GitHub (review requests silently do not happen).
+
+# Default: everything is owned by the project maintainers.
+*                               @proxmox-dc-sandbox/maintainers
+
+# Source modules: one owner entry per layer.
+/01-foundation/                 @proxmox-dc-sandbox/maintainers
+/02-networking/                 @proxmox-dc-sandbox/maintainers
+/03-compute/                    @proxmox-dc-sandbox/maintainers
+
+# Shared sub-modules: contract changes need extra review (consumed by layers).
+/modules/                       @proxmox-dc-sandbox/maintainers
+
+# Reference client project + docs: reviewed together with the modules.
+/examples/                      @proxmox-dc-sandbox/maintainers
+/docs/                          @proxmox-dc-sandbox/maintainers
+
+# Tooling and CI.
+/docker/                        @proxmox-dc-sandbox/maintainers
+/.github/                       @proxmox-dc-sandbox/maintainers

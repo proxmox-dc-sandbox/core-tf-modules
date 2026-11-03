@@ -1,0 +1,12 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security disclosure
+    url: https://github.com/security
+    about: |
+      Do not report vulnerabilities in a public issue — follow
+      SECURITY.md (private reporting channel of the repository).
+  - name: Terragrunt client usage
+    url: https://github.com/discussions
+    about: |
+      Questions about consuming the modules from a Terragrunt client
+      (pinning, remote state, provider generation) before opening an issue.

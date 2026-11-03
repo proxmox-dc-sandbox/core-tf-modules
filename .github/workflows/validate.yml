@@ -1,0 +1,111 @@
+# validate — OpenTofu / Terragrunt checks for the source modules and examples.
+#
+# Runs on every push to main and every pull request. No credentials are
+# involved: `tofu init -backend=false` only downloads the declared providers,
+# and no job ever plans or applies.
+#
+# Tool versions are pinned to the same values as docker/Dockerfile
+# (TOFU_VERSION / TERRAGRUNT_VERSION build args); keep them in sync.
+#
+# NOTE(publication): action references use major version tags (@v4, @v3...).
+# Before the repository goes public, pin them by commit SHA (Dependabot can
+# then keep them current).
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  TOFU_VERSION: "1.12.5"
+  TERRAGRUNT_VERSION: "1.2.1"
+
+jobs:
+  fmt:
+    name: tofu fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OpenTofu
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL \
+            "https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_linux_amd64.zip" \
+            -o /tmp/tofu.zip
+          unzip -o /tmp/tofu.zip -d "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          tofu version
+      - name: tofu fmt -check (modules + examples)
+        run: |
+          tofu fmt -check -recursive \
+            01-foundation 02-networking 03-compute modules examples
+
+  validate:
+    name: tofu validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OpenTofu
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL \
+            "https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_linux_amd64.zip" \
+            -o /tmp/tofu.zip
+          unzip -o /tmp/tofu.zip -d "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          tofu version
+      - name: tofu init -backend=false && validate (each module + test-local example)
+        run: |
+          set -euo pipefail
+          status=0
+          for d in 01-foundation 02-networking 03-compute \
+                   modules/* \
+                   01-foundation/examples/test-local \
+                   02-networking/examples/test-local \
+                   03-compute/examples/test-local; do
+            [[ -f "$d/main.tf" ]] || continue
+            echo "::group::tofu validate $d"
+            if (cd "$d" && tofu init -backend=false -input=false >/dev/null \
+                 && tofu validate); then
+              echo "OK: $d"
+            else
+              echo "::error::tofu validate failed for $d"
+              status=1
+            fi
+            echo "::endgroup::"
+          done
+          exit "$status"
+
+  terragrunt:
+    name: terragrunt hcl
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Terragrunt
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL \
+            "https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" \
+            -o "$HOME/.local/bin/terragrunt"
+          chmod +x "$HOME/.local/bin/terragrunt"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          terragrunt --version
+      - name: terragrunt hcl fmt --check (root + reference client)
+        run: |
+          set -euo pipefail
+          terragrunt hcl fmt --check .
+          terragrunt hcl fmt --check examples/terragrunt-client
+      - name: terragrunt hcl validate (reference client)
+        # WARN lines about "no outputs, but mock outputs provided" are
+        # expected here: the reference client is validated without any
+        # deployed dependency state.
+        run: |
+          cd examples/terragrunt-client
+          terragrunt hcl validate

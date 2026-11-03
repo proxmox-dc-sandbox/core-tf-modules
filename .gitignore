@@ -1,0 +1,39 @@
+# ---------------------------------------------------------------------------
+# Legacy reference tree: used as the migration source, never committed.
+# ---------------------------------------------------------------------------
+/to-dc-provisionner/
+
+# Client project built from the toadd tfvars: not part of the modules repo.
+/toadd/
+/toadd.zip
+
+# OpenTofu / Terraform local
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+crash.log
+*.plan
+
+# Local variable files / secrets
+terraform.tfvars
+secrets.tfvars
+*.secret.auto.tfvars
+*.tfvars.local
+
+# Terragrunt cache
+.terragrunt-cache/
+
+# Docker non-root HOME (SSH config, etc.)
+.docker-home/
+
+# Private keys / debug artifacts
+id_rsa
+*.pem
+prxtestkey
+prxtestkey.pub
+proxmox_dummy_host.txt
+info.txt
+nerror.txt
+theenv.txt
