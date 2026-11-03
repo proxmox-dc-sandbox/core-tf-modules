@@ -1,0 +1,12 @@
+# Build context for the pdcs-core-tf-modules image
+.git
+to-dc-provisionner
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+id_rsa
+*.pem
+crash.log
+*.plan
+.terragrunt-cache
+.docker-home

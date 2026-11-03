@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars and adjust to your lab.
+proxmox_ssh_address = "pve.example.com"
+# proxmox_ssh_private_key = "/workspace/id_rsa"
+# Alternatively export PROXMOX_VE_ENDPOINT / PROXMOX_VE_API_TOKEN.

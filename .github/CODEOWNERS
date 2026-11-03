@@ -1,0 +1,25 @@
+# CODEOWNERS
+#
+# TODO(pdcs): replace @pdcs-owner below with the actual GitHub user or team
+# owning the repository at public-release time. A CODEOWNERS entry that does
+# not resolve to an existing user/team is ignored by GitHub (review requests
+# silently do not happen).
+
+# Default: everything is owned by the project maintainers.
+*                               @pdcs-owner
+
+# Source modules: one owner entry per layer.
+/01-foundation/                 @pdcs-owner
+/02-networking/                 @pdcs-owner
+/03-compute/                    @pdcs-owner
+
+# Shared sub-modules: contract changes need extra review (consumed by layers).
+/modules/                       @pdcs-owner
+
+# Reference client project + docs: reviewed together with the modules.
+/examples/                       @pdcs-owner
+/docs/                           @pdcs-owner
+
+# Tooling and CI.
+/docker/                         @pdcs-owner
+/.github/                        @pdcs-owner
